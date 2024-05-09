@@ -3,7 +3,7 @@ import pino from "pino";
 import pino_http from "pino-http";
 import { performMigrations } from "./db";
 import { expressjwt } from "express-jwt";
-import authRouter from "./auth";
+import Routes from "./routes";
 
 const PORT = 8080
 
@@ -22,12 +22,7 @@ app.use(pino_http({
 //     ]
 // }))
 
-app.get("/", (req, res) => {
-    req.log.info("Hello World")
-    res.send("Hello World")
-})
-
-app.use("/auth", authRouter)
+app.use("/", Routes)
 
 performMigrations().then(() =>
     app.listen(PORT, () =>
