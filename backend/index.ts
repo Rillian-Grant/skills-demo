@@ -1,6 +1,7 @@
 import express from "express";
 import pino from "pino";
 import pino_http from "pino-http";
+import { performMigrations } from "./db";
 
 const PORT = 8080
 
@@ -15,6 +16,8 @@ app.get("/", (req, res) => {
     res.send("Hello World")
 })
 
-app.listen(PORT, () => {
-    logger.info({PORT}, "Server started")
-})
+performMigrations().then(() =>
+    app.listen(PORT, () =>
+        logger.info({PORT}, "Server started")
+    )
+)

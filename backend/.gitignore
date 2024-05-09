@@ -1,5 +1,6 @@
 # For Skills-Demo
 build
+*.sqlite
 
 # Logs
 logs
