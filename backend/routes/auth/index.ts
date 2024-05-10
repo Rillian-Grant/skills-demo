@@ -45,7 +45,10 @@ router.post(
 
         const token = jwt.sign(
             { user_id: id } as JWTPayload,
-            JWT_SECRET
+            JWT_SECRET,
+            {
+                expiresIn: "5m" // TODO: Move to config file.
+            }
         )
 
         return res.json({
