@@ -1,6 +1,8 @@
 import express, { NextFunction, Request as ExpressRequest, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { ZodError, z } from "zod";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "./config";
 
 interface Request<T = any> extends ExpressRequest {
     body: T;
@@ -27,7 +29,32 @@ export async function safetyNet500(req: Request, res: Response, next: NextFuncti
         next();
     } catch (error) {
         req.log.error({ error }, "Internal server error")
-        res.status(500).send()
+        res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+export interface JWTPayload extends jwt.JwtPayload {
+    user_id: number
+}
+
+export interface AuthenticatedRequest extends ExpressRequest {
+    user_id?: number
+}
+
+export function requireAuthentication(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    const token = req.headers["authorization"]?.split(" ")[1]; // Extract token from "Bearer TOKEN"
+    if (!token) return res.sendStatus(StatusCodes.UNAUTHORIZED);
+
+    try {
+        const payload = jwt.verify(token, JWT_SECRET) as JWTPayload; // We will only provide payloads
+        req.user_id = payload.user_id;
+        next();
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+            return res.sendStatus(StatusCodes.UNAUTHORIZED);
+        } else {
+            throw error;
+        }
     }
 }
 

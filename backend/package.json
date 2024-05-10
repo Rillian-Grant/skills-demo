@@ -1,9 +1,9 @@
 {
   "name": "skills-demo-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "build/backend/index.js",
   "scripts": {
-    "start": "tsc && concurrently --kill-others \"tsc --watch\" \"nodemon ./build/index.js | pino-pretty\"",
+    "start": "tsc && concurrently --kill-others \"tsc --watch\" \"nodemon | pino-pretty\"",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate"
   },

@@ -11,3 +11,12 @@ export type AuthRegisterResType = {
     name: string;
     email: string;
 };
+
+export const AuthLoginReqSchema = z.object({
+    email: z.string().email(),
+    password: z.string()
+})
+export type AuthLoginReqType = z.infer<typeof AuthLoginReqSchema>;
+export type AuthLoginResType = {
+    jwt: string
+}

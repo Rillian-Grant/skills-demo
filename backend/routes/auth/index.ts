@@ -1,10 +1,14 @@
 import express, { Router } from "express";
-import { baseMiddleware, validateBody } from "../../middleware";
+import { JWTPayload, baseMiddleware, requireAuthentication, validateBody } from "../../middleware";
 import { DBAuthRegisterReqSchema } from "./db-validators";
 import { db } from "../../db";
 import { user } from "../../schema";
-import { hashPassword } from "./utils";
-import { AuthRegisterResType } from "../../../shared/validators";
+import { comparePassword, hashPassword } from "./utils";
+import { AuthLoginReqSchema, AuthLoginResType, AuthRegisterResType } from "../../../shared/validators";
+import { eq } from "drizzle-orm";
+import { StatusCodes } from "http-status-codes";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../../config";
 
 const router = Router();
 router.use(...baseMiddleware)
@@ -21,12 +25,39 @@ router.post(
             password_hash
         }).returning(/* { id: user.id } */);
 
-        res.json({
+        return res.json({
             id,
-            name,
+            name: name ?? "",
             email
-        } as AuthRegisterResType);
+        } satisfies AuthRegisterResType);
     }
+)
+
+router.post(
+    "/login",
+    validateBody(AuthLoginReqSchema),
+    async (req, res) => {
+        const user_entry = await db.select().from(user).where(eq(user.email, req.body.email));
+        if (!user_entry.length) return res.sendStatus(StatusCodes.UNAUTHORIZED);
+
+        const [{id, password_hash}] = user_entry;
+        if (!comparePassword(password_hash, req.body.password)) return res.sendStatus(StatusCodes.UNAUTHORIZED);
+
+        const token = jwt.sign(
+            { user_id: id } as JWTPayload,
+            JWT_SECRET
+        )
+
+        return res.json({
+            jwt: token
+        } satisfies AuthLoginResType)
+    }
+)
+
+router.get(
+    "/check",
+    requireAuthentication,
+    (req, res) => res.sendStatus(200)
 )
 
 export default router;
