@@ -1,0 +1,11 @@
+{
+  "name": "skills-demo-shared",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Rillian Grant <rillian.grant@gmail.com>",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}

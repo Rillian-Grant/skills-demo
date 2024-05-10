@@ -1,18 +1,17 @@
 import express, { Router } from "express";
 import { validateBody } from "../../middleware";
-import { RegisterUserReqSchema } from "./validators";
+import { DBAuthRegisterReqSchema } from "./db-validators";
 import { db } from "../../db";
 import { user } from "../../schema";
 import { hashPassword } from "./utils";
-import { DrizzleError } from "drizzle-orm";
-import { RegisterUserResType } from "./validators";
+import { AuthRegisterResType } from "../../../shared/validators";
 
 const router = Router();
 router.use(express.json())
 
 router.post(
     "/register",
-    validateBody(RegisterUserReqSchema),
+    validateBody(DBAuthRegisterReqSchema),
     async (req, res) => {
         const password_hash = await hashPassword(req.body.password);
 
@@ -26,7 +25,7 @@ router.post(
             id,
             name,
             email
-        } as RegisterUserResType);
+        } as AuthRegisterResType);
     }
 )
 
