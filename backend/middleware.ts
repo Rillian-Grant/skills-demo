@@ -7,9 +7,9 @@ interface Request<T = any> extends ExpressRequest {
 }
 
 export function validateBody<T>(schema: z.ZodType<T>) { // Another any?
-    return (req: Request<T>, res: Response, next: NextFunction) => {
+    return async (req: Request<T>, res: Response, next: NextFunction) => {
         try {
-            req.body = schema.parse(req.body);
+            req.body = await schema.parseAsync(req.body);
             next();
         } catch (error) {
             if (error instanceof ZodError) {

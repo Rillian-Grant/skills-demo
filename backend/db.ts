@@ -5,10 +5,10 @@ import { DB_PATH } from "./config";
 import Database from "better-sqlite3";
 
 const sqlite = new Database(DB_PATH);
-const db = drizzle(sqlite)
+export const db = drizzle(sqlite)
 
-export async function performMigrations() {
-    await migrate(db, {
+export function performMigrations() {
+    migrate(db, {
         migrationsFolder: MIGRATIONS_FOLDER
     })
 }

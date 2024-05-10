@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently --kill-others \"tsc --watch\" \"nodemon ./build/index.js | pino-pretty\"",
+    "start": "tsc && concurrently --kill-others \"tsc --watch\" \"nodemon ./build/index.js | pino-pretty\"",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate"
   },
@@ -28,5 +28,8 @@
     "pino": "^9.0.0",
     "pino-http": "^10.1.0",
     "zod": "^3.23.8"
+  },
+  "nodemonConfig": {
+    "delay": 1000
   }
 }

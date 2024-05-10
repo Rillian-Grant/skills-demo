@@ -24,8 +24,8 @@ app.use(pino_http({
 
 app.use("/", Routes)
 
-performMigrations().then(() =>
-    app.listen(PORT, () =>
-        logger.info({PORT}, "Server started")
-    )
+performMigrations()
+
+app.listen(PORT, () =>
+    logger.info({PORT}, "Server started")
 )
