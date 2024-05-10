@@ -1,4 +1,4 @@
-import { NextFunction, Request as ExpressRequest, Response } from "express";
+import express, { NextFunction, Request as ExpressRequest, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { ZodError, z } from "zod";
 
@@ -21,3 +21,17 @@ export function validateBody<T>(schema: z.ZodType<T>) { // Another any?
         }
     }
 }
+
+export async function safetyNet500(req: Request, res: Response, next: NextFunction) {
+    try {
+        next();
+    } catch (error) {
+        req.log.error({ error }, "Internal server error")
+        res.status(500).send()
+    }
+}
+
+export const baseMiddleware = [
+    safetyNet500,
+    express.json()
+];

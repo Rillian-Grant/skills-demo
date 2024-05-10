@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { validateBody } from "../../middleware";
+import { baseMiddleware, validateBody } from "../../middleware";
 import { DBAuthRegisterReqSchema } from "./db-validators";
 import { db } from "../../db";
 import { user } from "../../schema";
@@ -7,7 +7,7 @@ import { hashPassword } from "./utils";
 import { AuthRegisterResType } from "../../../shared/validators";
 
 const router = Router();
-router.use(express.json())
+router.use(...baseMiddleware)
 
 router.post(
     "/register",
