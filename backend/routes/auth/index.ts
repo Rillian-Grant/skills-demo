@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import { JWTPayload, baseMiddleware, requireAuthentication, validateBody } from "../../middleware";
 import { DBAuthRegisterReqSchema } from "./db-validators";
-import { db } from "../../db";
+import { db } from "../../globals";
 import { user } from "../../schema";
 import { comparePassword, hashPassword } from "./utils";
 import { AuthLoginReqSchema, AuthLoginResType, AuthRegisterResType } from "../../../shared/validators";

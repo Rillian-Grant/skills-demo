@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db } from "../../db";
+import { db } from "../../globals";
 import { user } from "../../schema";
 import { eq } from "drizzle-orm";
 import { AuthRegisterReqSchema, AuthRegisterReqType } from "../../../shared/validators"

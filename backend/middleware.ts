@@ -3,6 +3,8 @@ import { StatusCodes } from "http-status-codes";
 import { ZodError, z } from "zod";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "./config";
+import { pinoHttp } from "pino-http";
+import { logger } from "./globals";
 
 interface Request<T = any> extends ExpressRequest {
     body: T;
@@ -60,5 +62,8 @@ export function requireAuthentication(req: AuthenticatedRequest, res: Response, 
 
 export const baseMiddleware = [
     safetyNet500,
+    pinoHttp({
+        logger
+    }),
     express.json()
 ];
