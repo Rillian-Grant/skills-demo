@@ -14,7 +14,7 @@ export function validateBody<T>(schema: z.ZodType<T>) { // Another any?
         } catch (error) {
             if (error instanceof ZodError) {
                 res.status(StatusCodes.BAD_REQUEST) // Bad Request
-                    .json(error.errors)
+                    .json(error.format())
             } else {
                 throw error
             }
