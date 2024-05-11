@@ -40,3 +40,4 @@ export type TypeReminderIdGet = TypeReminder;
 
 export const SchemaReminderPatchReq = SchemaReminder.partial();
 export type TypeReminderPatchReq = z.infer<typeof SchemaReminderPatchReq>;
+export type TypeReminderPatchRes = TypeReminder;

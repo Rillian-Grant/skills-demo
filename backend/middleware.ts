@@ -7,11 +7,16 @@ import { pinoHttp } from "pino-http";
 import { logger } from "./globals";
 
 
-// export function a(f: RequestHandler): RequestHandler {
-//     return function (req, res, next) {
-//         Promise.resolve(f(req, res, next)).catch(next)
-//     }
-// }
+/**
+ * ah - Async Handler
+ * @param f Your async handler function
+ * @returns A non-async handler function that passes errors to next
+ */
+export function ah(f: RequestHandler): RequestHandler {
+    return function (req, res, next) {
+        Promise.resolve(f(req, res, next)).catch(next)
+    }
+}
 
 interface Request<T = any> extends ExpressRequest {
     body: T;
@@ -33,10 +38,10 @@ export function validateBody<T>(schema: z.ZodType<T>) { // Another any?
     }
 }
 
-// export async function safetyNet500(err: Error, req: Request, res: ExpressResponse, next: NextFunction) {
-//         req.log.error({ err }, "Internal server error")
-//         res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
-// }
+export function safetyNet500(err: Error, req: Request, res: ExpressResponse, next: NextFunction) {
+    req.log.error({ err }, "Internal server error")
+    res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+}
 
 export interface JWTPayload extends jwt.JwtPayload {
     user_id: number
@@ -67,7 +72,8 @@ export function requireAuthentication(req: AuthenticatedRequest, res: ExpressRes
 export const baseMiddleware = [
 //    safetyNet500,
     pinoHttp({
-        logger
+        logger,
+        autoLogging: false
     }),
     express.json()
 ];
