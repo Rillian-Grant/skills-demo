@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { sqliteTable, text, integer, uniqueIndex, foreignKey } from "drizzle-orm/sqlite-core";
 
-export const user = sqliteTable("users", {
+export const users = sqliteTable("users", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     email: text("email").notNull().unique(),
     name: text("name"),
@@ -14,6 +14,7 @@ export const user = sqliteTable("users", {
 
 export const reminders = sqliteTable("reminders", {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    user_id: integer("user_id").references(() => users.id).notNull(),
     name: text("name").notNull(),
     content: text("content").notNull(),
     due_at: integer("due_at"), // Unix timestamp

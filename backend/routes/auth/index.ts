@@ -2,9 +2,9 @@ import express, { Router } from "express";
 import { JWTPayload, baseMiddleware, requireAuthentication, validateBody } from "../../middleware";
 import { DBAuthRegisterReqSchema } from "./db-validators";
 import { db } from "../../globals";
-import { user } from "../../schema";
+import { users } from "../../schema";
 import { comparePassword, hashPassword } from "./utils";
-import { AuthLoginReqSchema, AuthLoginResType, AuthRegisterResType } from "../../../shared/validators";
+import { SchemaAuthLoginReq, TypeAuthLoginRes, TypeAuthRegisterRes } from "../../../shared/validators";
 import { eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
@@ -19,7 +19,7 @@ router.post(
     async (req, res) => {
         const password_hash = await hashPassword(req.body.password);
 
-        const [{ id, name, email }] = await db.insert(user).values({
+        const [{ id, name, email }] = await db.insert(users).values({
             email: req.body.email,
             name: req.body.name,
             password_hash
@@ -29,15 +29,15 @@ router.post(
             id,
             name: name ?? "",
             email
-        } satisfies AuthRegisterResType);
+        } satisfies TypeAuthRegisterRes);
     }
 )
 
 router.post(
     "/login",
-    validateBody(AuthLoginReqSchema),
+    validateBody(SchemaAuthLoginReq),
     async (req, res) => {
-        const user_entry = await db.select().from(user).where(eq(user.email, req.body.email));
+        const user_entry = await db.select().from(users).where(eq(users.email, req.body.email));
         if (!user_entry.length) return res.sendStatus(StatusCodes.UNAUTHORIZED);
 
         const [{id, password_hash}] = user_entry;
@@ -47,13 +47,13 @@ router.post(
             { user_id: id } as JWTPayload,
             JWT_SECRET,
             {
-                expiresIn: "5m" // TODO: Move to config file.
+                expiresIn: "30m" // TODO: Move to config file.
             }
         )
 
         return res.json({
             jwt: token
-        } satisfies AuthLoginResType)
+        } satisfies TypeAuthLoginRes)
     }
 )
 

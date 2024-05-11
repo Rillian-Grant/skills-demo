@@ -1,4 +1,4 @@
-import express, { NextFunction, Request as ExpressRequest, Response } from "express";
+import express, { NextFunction, Request as ExpressRequest, Response as ExpressResponse, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 import { ZodError, z } from "zod";
 import jwt from "jsonwebtoken";
@@ -6,12 +6,19 @@ import { JWT_SECRET } from "./config";
 import { pinoHttp } from "pino-http";
 import { logger } from "./globals";
 
+
+// export function a(f: RequestHandler): RequestHandler {
+//     return function (req, res, next) {
+//         Promise.resolve(f(req, res, next)).catch(next)
+//     }
+// }
+
 interface Request<T = any> extends ExpressRequest {
     body: T;
 }
 
 export function validateBody<T>(schema: z.ZodType<T>) { // Another any?
-    return async (req: Request<T>, res: Response, next: NextFunction) => {
+    return async (req: Request<T>, res: ExpressResponse, next: NextFunction) => {
         try {
             req.body = await schema.parseAsync(req.body);
             next();
@@ -26,14 +33,10 @@ export function validateBody<T>(schema: z.ZodType<T>) { // Another any?
     }
 }
 
-export async function safetyNet500(req: Request, res: Response, next: NextFunction) {
-    try {
-        next();
-    } catch (error) {
-        req.log.error({ error }, "Internal server error")
-        res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
-    }
-}
+// export async function safetyNet500(err: Error, req: Request, res: ExpressResponse, next: NextFunction) {
+//         req.log.error({ err }, "Internal server error")
+//         res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+// }
 
 export interface JWTPayload extends jwt.JwtPayload {
     user_id: number
@@ -43,13 +46,14 @@ export interface AuthenticatedRequest extends ExpressRequest {
     user_id?: number
 }
 
-export function requireAuthentication(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+// TODO: Find out if it is possible to make it so that requireAuthentication takes in ExpressRequest but outputs AuthenticatedRequest
+export function requireAuthentication(req: AuthenticatedRequest, res: ExpressResponse, next: NextFunction) {
     const token = req.headers["authorization"]?.split(" ")[1]; // Extract token from "Bearer TOKEN"
     if (!token) return res.sendStatus(StatusCodes.UNAUTHORIZED);
 
     try {
         const payload = jwt.verify(token, JWT_SECRET) as JWTPayload; // We will only provide payloads
-        req.user_id = payload.user_id;
+        req.user_id = payload.user_id!;
         next();
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
@@ -61,7 +65,7 @@ export function requireAuthentication(req: AuthenticatedRequest, res: Response, 
 }
 
 export const baseMiddleware = [
-    safetyNet500,
+//    safetyNet500,
     pinoHttp({
         logger
     }),
