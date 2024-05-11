@@ -14,7 +14,7 @@ export const users = sqliteTable("users", {
 
 export const reminders = sqliteTable("reminders", {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    user_id: integer("user_id").references(() => users.id).notNull(),
+    user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
     name: text("name").notNull(),
     content: text("content").notNull(),
     due_at: integer("due_at"), // Unix timestamp

@@ -5,7 +5,7 @@ CREATE TABLE `reminders` (
 	`content` text NOT NULL,
 	`due_at` integer,
 	`completed_at` integer,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `users` (
