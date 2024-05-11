@@ -15,7 +15,7 @@ router.use(
 // GET /reminders
 router.get(
     "/",
-    async (req: AuthenticatedRequest, res, next) => {
+    ah(async (req: AuthenticatedRequest, res, next) => {
         const users_reminders = await db.select().from(reminders).where(eq(reminders.user_id, req.user_id!)) /* Shouldn't need to do this ! */
         return res.json(
             users_reminders.map(
@@ -28,14 +28,14 @@ router.get(
                 })
             ) satisfies TypeReminderGet
         )
-    }
+    })
 )
 
 // POST /reminders
 router.post(
     "/",
     validateBody(SchemaReminderPostReq),
-    async (req: AuthenticatedRequest, res) => {
+    ah(async (req: AuthenticatedRequest, res) => {
         const [reminder] = await db.insert(reminders).values({
             ...req.body,
             user_id: req.user_id
@@ -48,7 +48,7 @@ router.post(
             due_at: reminder.due_at,
             completed_at: reminder.completed_at
         } satisfies TypeReminderPostRes)
-    }
+    })
 )
 
 // GET /reminders/:id
@@ -78,7 +78,7 @@ router.get(
 router.patch(
     "/:id",
     validateBody(SchemaReminderPatchReq),
-    async (req: AuthenticatedRequest, res) => {
+    ah(async (req: AuthenticatedRequest, res) => {
         const [numeric_id] = sqids.decode(req.params.id)
         const [reminder] = await db.update(reminders)
             .set({
@@ -99,13 +99,13 @@ router.patch(
             due_at: reminder.due_at,
             completed_at: reminder.completed_at
         } satisfies TypeReminderPatchRes)
-    }
+    })
 )
 
 // DELETE /reminders/:id
 router.delete(
     "/:id",
-    async (req: AuthenticatedRequest, res) => {
+    ah(async (req: AuthenticatedRequest, res) => {
         const [numeric_id] = sqids.decode(req.params.id)
         const [reminder] = await db.delete(reminders).where(
             and(
@@ -117,7 +117,7 @@ router.delete(
         if (!reminder) return res.sendStatus(StatusCodes.NOT_FOUND);
 
         return res.send()
-    }
+    })
 )
 
 export default router;

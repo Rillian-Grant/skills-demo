@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { JWTPayload, baseMiddleware, requireAuthentication, validateBody } from "../../middleware";
+import { JWTPayload, ah, baseMiddleware, requireAuthentication, validateBody } from "../../middleware";
 import { DBAuthRegisterReqSchema } from "./db-validators";
 import { db } from "../../globals";
 import { users } from "../../schema";
@@ -16,7 +16,7 @@ router.use(...baseMiddleware)
 router.post(
     "/register",
     validateBody(DBAuthRegisterReqSchema),
-    async (req, res) => {
+    ah(async (req, res) => {
         const password_hash = await hashPassword(req.body.password);
 
         const [{ id, name, email }] = await db.insert(users).values({
@@ -30,18 +30,19 @@ router.post(
             name: name ?? "",
             email
         } satisfies TypeAuthRegisterRes);
-    }
+    })
 )
 
 router.post(
     "/login",
     validateBody(SchemaAuthLoginReq),
-    async (req, res) => {
+    ah(async (req, res) => {
         const user_entry = await db.select().from(users).where(eq(users.email, req.body.email));
         if (!user_entry.length) return res.sendStatus(StatusCodes.UNAUTHORIZED);
 
         const [{id, password_hash}] = user_entry;
-        if (!comparePassword(password_hash, req.body.password)) return res.sendStatus(StatusCodes.UNAUTHORIZED);
+        const password_correct = await comparePassword(password_hash, req.body.password);
+        if (!password_correct) return res.sendStatus(StatusCodes.UNAUTHORIZED);
 
         const token = jwt.sign(
             { user_id: id } as JWTPayload,
@@ -54,7 +55,7 @@ router.post(
         return res.json({
             jwt: token
         } satisfies TypeAuthLoginRes)
-    }
+    })
 )
 
 router.get(
