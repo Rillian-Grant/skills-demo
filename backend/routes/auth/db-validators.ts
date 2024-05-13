@@ -1,11 +1,10 @@
+import { eq } from "drizzle-orm";
 import { z } from "zod";
+import {
+  SchemaAuthRegisterReq
+} from "../../../shared/validators";
 import { db } from "../../globals";
 import { users } from "../../schema";
-import { eq } from "drizzle-orm";
-import {
-  SchemaAuthRegisterReq,
-  TypeAuthRegisterReq,
-} from "../../../shared/validators";
 
 async function userEmailIsUnique(email: string): Promise<boolean> {
   const res = await db.select().from(users).where(eq(users.email, email));

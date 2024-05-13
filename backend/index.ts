@@ -1,10 +1,9 @@
-import express from "express";
-import { db, logger } from "./globals";
-import Routes from "./routes";
-import { PORT } from "./config";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import { MIGRATIONS_FOLDER } from "./config";
+import express from "express";
+import { MIGRATIONS_FOLDER, PORT } from "./config";
+import { db, logger } from "./globals";
 import { safetyNet500 } from "./middleware";
+import Routes from "./routes";
 
 const app = express();
 

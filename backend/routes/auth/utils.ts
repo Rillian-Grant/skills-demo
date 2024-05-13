@@ -1,4 +1,4 @@
-import { scrypt, randomBytes, timingSafeEqual, BinaryLike } from "crypto";
+import { BinaryLike, randomBytes, scrypt, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { PASSWORD_SALT_LENGTH, PASSWORD_SCRYPT_KEYLEN } from "../../config";
 

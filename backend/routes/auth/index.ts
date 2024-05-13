@@ -1,4 +1,14 @@
-import express, { Router } from "express";
+import { eq } from "drizzle-orm";
+import { Router } from "express";
+import { StatusCodes } from "http-status-codes";
+import jwt from "jsonwebtoken";
+import {
+  SchemaAuthLoginReq,
+  TypeAuthLoginRes,
+  TypeAuthRegisterRes,
+} from "../../../shared/validators";
+import { JWT_SECRET } from "../../config";
+import { db } from "../../globals";
 import {
   JWTPayload,
   ah,
@@ -6,19 +16,9 @@ import {
   requireAuthentication,
   validateBody,
 } from "../../middleware";
-import { DBAuthRegisterReqSchema } from "./db-validators";
-import { db } from "../../globals";
 import { users } from "../../schema";
+import { DBAuthRegisterReqSchema } from "./db-validators";
 import { comparePassword, hashPassword } from "./utils";
-import {
-  SchemaAuthLoginReq,
-  TypeAuthLoginRes,
-  TypeAuthRegisterRes,
-} from "../../../shared/validators";
-import { eq } from "drizzle-orm";
-import { StatusCodes } from "http-status-codes";
-import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../../config";
 
 const router = Router();
 router.use(...baseMiddleware);
